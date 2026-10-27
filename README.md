@@ -1,4 +1,5 @@
-<<<<<<< HEAD
+
+
 # Gestor de Torneos de Videojuegos
 
 API REST en Java 17 con Spring Boot 3, organizada con **arquitectura hexagonal** y **DDD**.
@@ -6,6 +7,15 @@ Integra dos fuentes de datos abiertos colombianos (datos.gov.co y DANE) con **ci
 **retry con backoff exponencial** y análisis descriptivo con **DuckDB**.
 
 Proyecto semestral del Taller de Programación 2026-262, Universidad Manuela Beltrán (guía 6, sesiones 11 y 12).
+# Proyecto-gestor-de-torneos-integrado
+# Gestor de Torneos de Videojuegos
+
+API REST desarrollada en Java 17 con Spring Boot 3, organizada mediante arquitectura hexagonal y Domain-Driven Design (DDD).
+
+El proyecto integra fuentes de datos abiertos colombianos, como datos.gov.co y DANE, mecanismos de resiliencia (circuit breaker y retry con backoff exponencial) y análisis descriptivo con DuckDB.
+
+Proyecto semestral del Taller de Programación 2026-262 de la Universidad Manuela Beltrán, correspondiente a la guía 6, sesiones 11 y 12.
+>>>>>>> 41d22a3fc7826f06e4bc6354fefada450b179c12
 
 ## Arquitectura
 
@@ -45,6 +55,58 @@ mvn spring-boot:run    # levanta la API en http://localhost:8080
 Documentación interactiva: http://localhost:8080/swagger-ui.html
 
 ## Endpoints
+├── domain/           # Entidades y reglas de negocio
+├── application/      # Casos de uso y puertos
+├── api/               # Controladores REST, DTOs y errores HTTP
+└── infrastructure/   # Adaptadores, persistencia e integraciones
+```
+
+Las decisiones de arquitectura se documentan en `docs/adr/`:
+
+- ADR-001: arquitectura hexagonal y bounded contexts.
+- ADR-002: implementación de circuit breaker y retry.
+
+## Requisitos
+
+- JDK 17 o superior.
+- Maven 3.8 o superior.
+- MySQL 8 o superior para ejecutar la aplicación, según la configuración del proyecto.
+- Clave de OpenAI opcional para las funciones del asistente.
+
+Las pruebas utilizan H2.
+
+## Configuración
+
+Revisa el archivo `.env.example` y configura las variables de entorno necesarias.
+
+**No publiques claves de API, contraseñas ni credenciales en GitHub.**
+
+Los identificadores de datasets de datos.gov.co y DANE aparecen como `CAMBIAR_ID_DATASET`. Debes sustituirlos por identificadores reales antes de utilizar el análisis de datos abiertos.
+
+## Ejecutar
+
+Desde la raíz del proyecto, ejecuta las pruebas:
+
+```bash
+mvn clean verify
+```
+
+Para iniciar la aplicación:
+
+```bash
+mvn spring-boot:run
+```
+
+Si el inicio termina correctamente y la aplicación utiliza el puerto 8080, estará disponible en:
+
+http://localhost:8080
+
+Documentación interactiva de la API, si Swagger UI está habilitado:
+
+http://localhost:8080/swagger-ui.html
+
+## Endpoints principales
+>>>>>>> 41d22a3fc7826f06e4bc6354fefada450b179c12
 
 | Método | Ruta | Descripción |
 |---|---|---|
@@ -57,6 +119,17 @@ Documentación interactiva: http://localhost:8080/swagger-ui.html
 | GET | `/api/opendata/summary?limit=100` | Análisis con DuckDB de cada fuente abierta |
 
 ### Ejemplo de creación
+| GET | `/api/tournaments/{id}` | Consultar un torneo |
+| POST | `/api/tournaments` | Crear un torneo |
+| PUT | `/api/tournaments/{id}` | Actualizar un torneo |
+| DELETE | `/api/tournaments/{id}` | Eliminar un torneo |
+| POST | `/api/assistant/ask` | Consultar el asistente |
+| GET | `/api/opendata/summary?limit=100` | Obtener análisis de datos abiertos |
+
+Los endpoints y sus parámetros deben coincidir con los controladores implementados en el código.
+
+## Ejemplo de creación de un torneo
+>>>>>>> 41d22a3fc7826f06e4bc6354fefada450b179c12
 
 ```json
 {
@@ -68,6 +141,7 @@ Documentación interactiva: http://localhost:8080/swagger-ui.html
   "description": "Torneo de eliminación directa"
 }
 ```
+
 
 ### Ejemplo de datos abiertos
 
@@ -114,6 +188,7 @@ mvn clean verify
 ## Control de versiones
 
 Commits con Conventional Commits, por ejemplo `feat: add DuckDB summary for open-data sources`.
-=======
 # Proyecto-gestor-de-torneos-integrado
 >>>>>>> e94f88fe0ae923618c521c3e308d83c45e34aff7
+
+>>>>>>> 41d22a3fc7826f06e4bc6354fefada450b179c12
