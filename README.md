@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Gestor de Torneos de Videojuegos
 
 API REST en Java 17 con Spring Boot 3, organizada con **arquitectura hexagonal** y **DDD**.
@@ -113,3 +114,6 @@ mvn clean verify
 ## Control de versiones
 
 Commits con Conventional Commits, por ejemplo `feat: add DuckDB summary for open-data sources`.
+=======
+# Proyecto-gestor-de-torneos-integrado
+>>>>>>> e94f88fe0ae923618c521c3e308d83c45e34aff7
