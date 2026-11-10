@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # Dependencias Maven (Spring Boot, JJWT, PIT, JaCoCo...)
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Versiones de las acciones de GitHub usadas en los workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

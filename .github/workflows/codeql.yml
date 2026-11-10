@@ -1,0 +1,39 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1" # cada lunes
+
+jobs:
+  analyze:
+    name: Analizar (java-kotlin)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin
+          build-mode: manual
+          queries: security-extended
+
+      - name: Compilar para que CodeQL vea el codigo
+        run: mvn -B -DskipTests package
+
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:java-kotlin"
