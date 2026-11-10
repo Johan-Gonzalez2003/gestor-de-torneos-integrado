@@ -21,7 +21,7 @@
         <java.version>17</java.version>
         <jjwt.version>0.12.6</jjwt.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <pitest.version>1.17.0</pitest.version>
+        <pitest.version>1.30.2</pitest.version>
 
         <!-- SonarCloud: reemplazar por los valores reales de su organizacion y proyecto -->
         <sonar.organization>TU_ORGANIZACION</sonar.organization>
