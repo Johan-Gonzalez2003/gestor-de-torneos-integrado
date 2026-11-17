@@ -1,5 +1,6 @@
 package com.tournamentmanager.api;
 
+import com.torneos.TorneosApplication;
 import com.tournamentmanager.api.dto.TournamentRequest;
 import com.tournamentmanager.domain.TournamentStatus;
 import com.tournamentmanager.infrastructure.persistence.SpringDataTournamentJpaRepository;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -18,8 +21,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(classes = TorneosApplication.class)
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@WithMockUser(roles = "ADMIN") // la aplicacion integrada exige JWT; aqui se simula un usuario autenticado
 class TournamentApiIntegrationTest {
 
     @Autowired

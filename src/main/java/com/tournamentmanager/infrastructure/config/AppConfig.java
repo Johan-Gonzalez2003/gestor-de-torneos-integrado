@@ -27,7 +27,7 @@ import java.util.List;
  * Composición de la aplicación: aquí se cablean puertos con adaptadores.
  * Todas las dependencias se pasan por constructor, así que cada servicio es fácil de probar con mocks.
  */
-@Configuration
+@Configuration("tournamentAppConfig")
 @EnableConfigurationProperties(OpenDataProperties.class)
 public class AppConfig {
 
@@ -38,10 +38,7 @@ public class AppConfig {
     private static final double RETRY_MULTIPLIER = 2.0;
     private static final Duration RETRY_MAX_BACKOFF = Duration.ofSeconds(4);
 
-    @Bean
-    public Clock clock() {
-        return Clock.systemDefaultZone();
-    }
+    // El bean Clock lo define com.torneos.config.AppConfig (uno solo para toda la aplicacion).
 
     @Bean
     public TournamentService tournamentService(TournamentRepositoryPort repository, Clock clock) {

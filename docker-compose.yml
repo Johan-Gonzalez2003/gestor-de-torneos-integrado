@@ -1,0 +1,48 @@
+# Levanta la aplicación y la base de datos:  docker compose up --build
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: torneos-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # Aplicación Spring Boot (espera a que la base de datos esté lista)
+  app:
+    build: .
+    container_name: torneos-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      DATOS_GOV_CO_DATASET_ID: ${DATOS_GOV_CO_DATASET_ID:-CAMBIAR_ID_DATASET}
+      DANE_DATASET_ID: ${DANE_DATASET_ID:-CAMBIAR_ID_DATASET}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 3s
+      start_period: 60s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:

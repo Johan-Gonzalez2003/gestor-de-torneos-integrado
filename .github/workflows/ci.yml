@@ -1,3 +1,4 @@
+# Pipeline de 4 etapas: 1) Test  2) Build  3) Push  4) Deploy
 name: CI
 
 on:
@@ -11,7 +12,7 @@ permissions:
 
 jobs:
   build-and-sonar:
-    name: Build, tests y SonarCloud
+    name: "Etapa 1a - Test: build, pruebas y SonarCloud"
     runs-on: ubuntu-latest
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -36,7 +37,7 @@ jobs:
           -Dsonar.qualitygate.wait=true
 
   mutation-testing:
-    name: Mutation Testing (PIT)
+    name: "Etapa 1b - Test: Mutation Testing (PIT)"
     runs-on: ubuntu-latest
     needs: build-and-sonar
     permissions:
@@ -76,3 +77,64 @@ jobs:
           git add mutation.json
           git commit -m "Actualizar badge de mutation score"
           git push --force origin badges
+
+  # ---------- ETAPA 2: BUILD ----------
+  docker-build:
+    name: "Etapa 2 - Build: imagen Docker"
+    runs-on: ubuntu-latest
+    needs: [build-and-sonar, mutation-testing]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Construir imagen (sin publicar)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: gestor-torneos:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Tamaño de la imagen
+        run: docker images gestor-torneos:ci --format "Tamaño de la imagen -> {{.Size}}"
+
+  # ---------- ETAPA 3: PUSH ----------
+  docker-push:
+    name: "Etapa 3 - Push: Docker Hub"
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publicar imagen (latest + SHA del commit)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/gestor-torneos:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/gestor-torneos:${{ github.sha }}
+          cache-from: type=gha
+
+  # ---------- ETAPA 4: DEPLOY ----------
+  deploy:
+    name: "Etapa 4 - Deploy: Render"
+    runs-on: ubuntu-latest
+    needs: docker-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Disparar el despliegue en Render
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+      - name: Prueba de humo (espera a que /actuator/health responda 200)
+        run: |
+          for i in $(seq 1 24); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.APP_PUBLIC_URL }}/actuator/health" || true)
+            echo "intento $i -> HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 15
+          done
+          echo "La aplicación no respondió a tiempo" && exit 1
